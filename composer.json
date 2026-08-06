@@ -1,0 +1,8 @@
+{
+    "name": "user/cek-cctv-kapal",
+    "description": "Aplikasi cek serial number CCTV kapal dengan login admin/client dan import Excel",
+    "require": {
+        "php": ">=8.0",
+        "phpoffice/phpspreadsheet": "^2.0"
+    }
+}

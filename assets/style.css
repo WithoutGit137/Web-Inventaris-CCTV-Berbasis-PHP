@@ -1,0 +1,348 @@
+/* ==========================================================================
+   1. RESET & BASE STYLES
+   ========================================================================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f3f4f6;
+    color: #1f2937;
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ==========================================================================
+   2. NAVBAR & LOGOUT BUTTON (DIPERBAIKI)
+   ========================================================================== */
+.navbar {
+    background-color: #0f172a;
+    padding: 14px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar .brand {
+    color: #ffffff;
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.navbar .menu {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.navbar .menu a {
+    color: #cbd5e1;
+    text-decoration: none;
+    font-size: 0.925rem;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.navbar .menu a:hover {
+    color: #ffffff;
+}
+
+.navbar .user-info {
+    color: #94a3b8;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Tombol Logout Merah Presisi */
+.btn-logout {
+    background-color: #ef4444;
+    color: #ffffff !important;
+    height: 36px;
+    padding: 0 16px;
+    font-size: 0.85rem !important;
+    font-weight: 600;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+    line-height: 1;
+}
+
+.btn-logout:hover {
+    background-color: #dc2626;
+}
+
+/* ==========================================================================
+   3. CONTAINER & LAYOUT (MELEBAR UNTUK DESKTOP)
+   ========================================================================== */
+.container {
+    max-width: 1200px; /* Dilebarkan dari 1000px agar tabel 8 kolom muat sempurna */
+    width: 95%;
+    margin: 30px auto;
+    background: #ffffff;
+    padding: 32px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    flex: 1;
+}
+
+.login-container {
+    max-width: 420px;
+    margin: 60px auto;
+}
+
+h1 {
+    font-size: 1.6rem;
+    color: #0f172a;
+    margin-bottom: 6px;
+    font-weight: 700;
+}
+
+.subtitle {
+    color: #64748b;
+    font-size: 0.925rem;
+    margin-bottom: 24px;
+}
+
+/* ==========================================================================
+   4. FORM & UNIVERSAL BUTTON STYLES
+   ========================================================================== */
+input[type="text"],
+input[type="password"],
+select,
+textarea {
+    width: 100%;
+    height: 44px;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    background-color: #ffffff;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+button, 
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    padding: 0 18px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #ffffff;
+    background-color: #2563eb;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    box-sizing: border-box;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+button:hover, 
+.btn:hover {
+    background-color: #1d4ed8;
+}
+
+button:active, 
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn-secondary { background-color: #475569; }
+.btn-secondary:hover { background-color: #334155; }
+
+.btn-danger { background-color: #dc2626; }
+.btn-danger:hover { background-color: #b91c1c; }
+
+.btn-sm {
+    height: 32px;
+    padding: 0 12px;
+    font-size: 0.8rem;
+    border-radius: 6px;
+}
+
+.form-group {
+    margin-bottom: 18px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #334155;
+}
+
+.search-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+    align-items: center;
+}
+
+.search-form input[type="text"] {
+    flex: 1;
+    min-width: 200px;
+}
+
+.actions-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+/* ==========================================================================
+   5. BADGES & ALERTS
+   ========================================================================== */
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 20px;
+    margin-bottom: 12px;
+}
+
+.badge-blue { background-color: #e0f2fe; color: #0369a1; }
+
+.alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+.alert-success { background-color: #dcfce7; color: #15803d; }
+.alert-danger { background-color: #fee2e2; color: #b91c1c; }
+
+.empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #94a3b8;
+    font-size: 0.95rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 2px dashed #e2e8f0;
+}
+
+/* ==========================================================================
+   6. TABEL DESKTOP OPTIMIZATION (DIPERBAIKI SANGAT RAPI)
+   ========================================================================== */
+.table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.875rem;
+}
+
+th, td {
+    padding: 10px 12px; /* Padding lebih ringkas agar muat tanpa scroll */
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: middle;
+}
+
+th { 
+    background-color: #f8fafc; 
+    color: #475569; 
+    font-weight: 600; 
+    white-space: nowrap;
+}
+
+tr:hover td { 
+    background-color: #f8fafc; 
+}
+
+/* ==========================================================================
+   7. FOOTER
+   ========================================================================== */
+.footer {
+    text-align: center;
+    padding: 20px 16px;
+    font-size: 0.85rem;
+    background-color: #0f172a;
+    color: #94a3b8;
+    margin-top: auto;
+}
+
+/* ==========================================================================
+   8. RESPONSIVE MOBILE (HP & TABLET)
+   ========================================================================== */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        padding: 16px;
+        gap: 12px;
+    }
+
+    .navbar .menu {
+        flex-direction: column;
+        width: 100%;
+        gap: 8px;
+    }
+
+    .navbar .menu a {
+        display: block;
+        text-align: center;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 6px;
+        width: 100%;
+    }
+
+    .container, .login-container {
+        width: 92%;
+        margin: 16px auto;
+        padding: 20px 16px;
+    }
+
+    .search-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-form input[type="text"],
+    .search-form button,
+    .search-form .btn {
+        width: 100%;
+    }
+
+    .actions-row {
+        flex-direction: column;
+    }
+
+    .actions-row .btn {
+        width: 100%;
+    }
+
+    th, td {
+        white-space: nowrap;
+    }
+}
