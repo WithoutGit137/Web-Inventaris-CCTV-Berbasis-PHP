@@ -7,7 +7,7 @@ $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $isEdit = $id > 0;
 
 $data = [
-    'serial_number' => '', 'nama_kapal' => '', 'jenis_barang' => '',
+    'serial_number' => '', 'kondisi' => 'Baru', 'nama_kapal' => '', 'jenis_barang' => '',
     'brand_barang' => '', 'no_model' => '', 'posisi_barang' => '', 'tahun_perolehan' => '',
 ];
 $error = '';
@@ -26,6 +26,7 @@ if ($isEdit) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data['serial_number']   = trim($_POST['serial_number'] ?? '');
+    $data['kondisi']         = trim($_POST['kondisi'] ?? 'Baru');
     $data['nama_kapal']      = trim($_POST['nama_kapal'] ?? '');
     $data['jenis_barang']    = trim($_POST['jenis_barang'] ?? '');
     $data['brand_barang']    = trim($_POST['brand_barang'] ?? '');
@@ -43,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare(
                     "UPDATE cctv_inventory SET
                         serial_number = :serial_number,
+                        kondisi = :kondisi,
                         nama_kapal = :nama_kapal,
                         jenis_barang = :jenis_barang,
                         brand_barang = :brand_barang,
@@ -53,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 );
                 $stmt->execute([
                     'serial_number' => $data['serial_number'],
+                    'kondisi' => $data['kondisi'],
                     'nama_kapal' => $data['nama_kapal'],
                     'jenis_barang' => $data['jenis_barang'],
                     'brand_barang' => $data['brand_barang'],
@@ -61,16 +64,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'tahun_perolehan' => $data['tahun_perolehan'],
                     'id' => $id,
                 ]);
+
+                // Cek apakah kondisi diubah, jika ya masukan ke log
+                if ($data['kondisi'] !== $existing['kondisi']) {
+                    $log = $pdo->prepare("INSERT INTO cctv_kondisi_log (cctv_id, kondisi) VALUES (:cctv_id, :kondisi)");
+                    $log->execute(['cctv_id' => $id, 'kondisi' => $data['kondisi']]);
+                }
+
                 setFlash('success', 'Data berhasil diperbarui.');
             } else {
                 $stmt = $pdo->prepare(
                     "INSERT INTO cctv_inventory
-                        (serial_number, nama_kapal, jenis_barang, brand_barang, no_model, posisi_barang, tahun_perolehan)
+                        (serial_number, kondisi, nama_kapal, jenis_barang, brand_barang, no_model, posisi_barang, tahun_perolehan)
                      VALUES
-                        (:serial_number, :nama_kapal, :jenis_barang, :brand_barang, :no_model, :posisi_barang, :tahun_perolehan)"
+                        (:serial_number, :kondisi, :nama_kapal, :jenis_barang, :brand_barang, :no_model, :posisi_barang, :tahun_perolehan)"
                 );
                 $stmt->execute([
                     'serial_number' => $data['serial_number'],
+                    'kondisi' => $data['kondisi'],
                     'nama_kapal' => $data['nama_kapal'],
                     'jenis_barang' => $data['jenis_barang'],
                     'brand_barang' => $data['brand_barang'],
@@ -78,13 +89,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'posisi_barang' => $data['posisi_barang'],
                     'tahun_perolehan' => $data['tahun_perolehan'],
                 ]);
+                
+                // Ambil ID yang baru ditambahkan untuk dimasukkan ke log pertama kalinya
+                $newId = $pdo->lastInsertId();
+                $log = $pdo->prepare("INSERT INTO cctv_kondisi_log (cctv_id, kondisi) VALUES (:cctv_id, :kondisi)");
+                $log->execute(['cctv_id' => $newId, 'kondisi' => $data['kondisi']]);
+
                 setFlash('success', 'Data baru berhasil ditambahkan.');
             }
             header('Location: index.php');
             exit;
         } catch (PDOException $e) {
             if ($e->getCode() === '23000') {
-                $error = 'Serial number "' . $data['serial_number'] . '" sudah terdaftar. Gunakan serial number lain atau edit data yang sudah ada.';
+                $error = 'Serial number "' . $data['serial_number'] . '" sudah terdaftar.';
             } else {
                 $error = 'Gagal menyimpan data: ' . $e->getMessage();
             }
@@ -114,36 +131,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <form method="post" class="stacked">
         <div class="field">
             <label for="serial_number">Serial Number</label>
-            <!-- Layout Flex untuk input dan tombol -->
             <div style="display: flex; gap: 8px; align-items: center;">
                 <input type="text" id="serial_number" name="serial_number" required value="<?= htmlspecialchars($data['serial_number']) ?>" style="flex: 1;">
-                <button type="button" id="btn-scan" class="btn btn-secondary" style="white-space: nowrap;">📷 Scan Code-128/QR</button>
+                <button type="button" id="btn-scan" class="btn btn-secondary" style="white-space: nowrap;">📷 Scan</button>
             </div>
         </div>
+        
+        <div class="field">
+            <label>Kondisi Barang</label>
+            <select name="kondisi" required>
+                <option value="Baru" <?= $data['kondisi'] === 'Baru' ? 'selected' : '' ?>>1. Baru</option>
+                <option value="Sangat Baik" <?= $data['kondisi'] === 'Sangat Baik' ? 'selected' : '' ?>>2. Sangat Baik</option>
+                <option value="Baik" <?= $data['kondisi'] === 'Baik' ? 'selected' : '' ?>>3. Baik</option>
+                <option value="Cukup" <?= $data['kondisi'] === 'Cukup' ? 'selected' : '' ?>>4. Cukup</option>
+                <option value="Rusak" <?= $data['kondisi'] === 'Rusak' ? 'selected' : '' ?>>5. Rusak</option>
+            </select>
+        </div>
+
         <div class="field">
             <label>Nama Kapal</label>
             <input type="text" name="nama_kapal" required value="<?= htmlspecialchars($data['nama_kapal']) ?>">
         </div>
-        <div class="field">
-            <label>Jenis Barang</label>
-            <input type="text" name="jenis_barang" required value="<?= htmlspecialchars($data['jenis_barang']) ?>" placeholder="Contoh: Kamera CCTV Dome">
-        </div>
-        <div class="field">
-            <label>Brand Barang</label>
-            <input type="text" name="brand_barang" required value="<?= htmlspecialchars($data['brand_barang']) ?>" placeholder="Contoh: Hikvision">
-        </div>
-        <div class="field">
-            <label>No. Model Barang</label>
-            <input type="text" name="no_model" required value="<?= htmlspecialchars($data['no_model']) ?>">
-        </div>
-        <div class="field">
-            <label>Posisi Barang</label>
-            <input type="text" name="posisi_barang" required value="<?= htmlspecialchars($data['posisi_barang']) ?>" placeholder="Contoh: Deck Kemudi">
-        </div>
-        <div class="field">
-            <label>Tahun Perolehan</label>
-            <input type="text" name="tahun_perolehan" required value="<?= htmlspecialchars($data['tahun_perolehan']) ?>" placeholder="Contoh: 2024" maxlength="4">
-        </div>
+        <div class="field"><label>Jenis Barang</label><input type="text" name="jenis_barang" required value="<?= htmlspecialchars($data['jenis_barang']) ?>"></div>
+        <div class="field"><label>Brand Barang</label><input type="text" name="brand_barang" required value="<?= htmlspecialchars($data['brand_barang']) ?>"></div>
+        <div class="field"><label>No. Model Barang</label><input type="text" name="no_model" required value="<?= htmlspecialchars($data['no_model']) ?>"></div>
+        <div class="field"><label>Posisi Barang</label><input type="text" name="posisi_barang" required value="<?= htmlspecialchars($data['posisi_barang']) ?>"></div>
+        <div class="field"><label>Tahun Perolehan</label><input type="text" name="tahun_perolehan" required value="<?= htmlspecialchars($data['tahun_perolehan']) ?>" maxlength="4"></div>
+        
         <div class="actions-row" style="margin-top: 20px;">
             <button type="submit" class="btn"><?= $isEdit ? 'Simpan Perubahan' : 'Simpan Data' ?></button>
             <a href="index.php" class="btn btn-secondary">Batal</a>
@@ -164,9 +178,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </div>
 
-<div class="footer">
-    &copy; 2026 Hafizh Ibrahim. SMK 3 Negeri Jakarta. Sistem Inventory CCTV Kapal PID.
-</div>
+<!-- Termasuk Footer -->
+<?php include __DIR__ . '/partials/footer.php'; ?>
 
 <!-- Script Library HTML5-QRCode -->
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
@@ -176,49 +189,54 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnCloseScan = document.getElementById('btn-close-scan');
     const scannerModal = document.getElementById('scannerModal');
     const serialInput = document.getElementById('serial_number');
-    let html5QrcodeScanner = null;
+    
+    let html5QrCode = null;
 
     // Saat tombol scan diklik
     btnScan.addEventListener('click', function() {
         scannerModal.style.display = 'flex'; // Tampilkan modal
         
-        // Inisialisasi library scanner
-        html5QrcodeScanner = new Html5QrcodeScanner(
-            "reader",
-            { 
-                fps: 10, 
-                qrbox: {width: 250, height: 150},
-                supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
+        if (!html5QrCode) {
+            html5QrCode = new Html5Qrcode("reader");
+        }
+
+        const config = { fps: 10, qrbox: { width: 250, height: 150 } };
+
+        // Nyalakan kamera (mengutamakan kamera belakang)
+        html5QrCode.start(
+            { facingMode: "environment" }, 
+            config,
+            (decodedText, decodedResult) => {
+                // Ketika barcode berhasil terbaca
+                serialInput.value = decodedText;
+                
+                // Berikan efek highlight sementara
+                serialInput.style.backgroundColor = '#dcfce7';
+                setTimeout(() => { serialInput.style.backgroundColor = ''; }, 1000);
+                
+                closeScanner(); // Matikan kamera dan tutup modal
             },
-            /* verbose= */ false
-        );
-        
-        // Jika berhasil terbaca
-        html5QrcodeScanner.render(function(decodedText, decodedResult) {
-            // Masukkan teks hasil scan ke dalam kolom input
-            serialInput.value = decodedText;
-            
-            // Berikan efek highlight sementara agar user sadar datanya masuk
-            serialInput.style.backgroundColor = '#dcfce7';
-            setTimeout(() => { serialInput.style.backgroundColor = ''; }, 1000);
-            
-            closeScanner(); // Tutup kamera otomatis
-        }, function(error) {
-            // Error kamera (diabaikan secara visual karena scanning terus berjalan di latar belakang)
+            (errorMessage) => {
+                // Abaikan error per-frame saat sedang mencari barcode
+            }
+        ).catch(err => {
+            alert("Gagal membuka kamera: " + err);
+            closeScanner();
         });
     });
 
-    // Saat tombol tutup diklik
+    // Saat tombol tutup diklik manual
     btnCloseScan.addEventListener('click', closeScanner);
 
     function closeScanner() {
         scannerModal.style.display = 'none'; // Sembunyikan modal
-        if (html5QrcodeScanner) {
-            // Matikan kamera dan hapus instance
-            html5QrcodeScanner.clear().catch(error => {
+        if (html5QrCode) {
+            // Matikan proses kamera
+            html5QrCode.stop().then(() => {
+                html5QrCode.clear();
+            }).catch(error => {
                 console.error("Gagal mematikan kamera. ", error);
             });
-            html5QrcodeScanner = null;
         }
     }
 });

@@ -2,6 +2,17 @@
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/auth.php';
 
+function getDeskripsiKondisi($kondisi) {
+    switch($kondisi) {
+        case 'Baru': return 'Kondisi 100% sempurna, segel pabrik, belum aktivasi';
+        case 'Sangat Baik': return 'Sudah dibuka/dipakai singkat, fisik mulus total, berfungsi 100% normal';
+        case 'Baik': return 'Ada bekas pakai wajar atau hasil perbaikan standar pabrik, fungsi utama lancar';
+        case 'Cukup': return 'Ada cacat fisik jelas atau penurunan fungsi komponen tertentu, tetapi masih bisa menyala';
+        case 'Rusak': return 'Mati total, hancur, atau biaya perbaikan sudah tidak ekonomis lagi';
+        default: return '';
+    }
+}
+
 $flash = getFlash();
 
 $keyword = trim($_GET['lokasi'] ?? '');
@@ -24,7 +35,7 @@ if (isset($pdo)) {
 
 // LOGIKA QUERY YANG SUDAH DISESUAIKAN
 if ($hasSearched) {
-    $sql = "SELECT id, serial_number, nama_kapal, jenis_barang, brand_barang, no_model, posisi_barang, tahun_perolehan
+    $sql = "SELECT id, serial_number, kondisi, nama_kapal, jenis_barang, brand_barang, no_model, posisi_barang, tahun_perolehan
             FROM cctv_inventory WHERE 1=1";
     $params = [];
 
@@ -58,7 +69,7 @@ if ($hasSearched) {
 } elseif (function_exists('isAdmin') && isAdmin()) {
     // Jika tidak mencari apa-apa, tapi login sebagai admin (tampilkan semua)
     $results = $pdo->query(
-        "SELECT id, serial_number, nama_kapal, jenis_barang, brand_barang, no_model, posisi_barang, tahun_perolehan
+        "SELECT id, serial_number, kondisi, nama_kapal, jenis_barang, brand_barang, no_model, posisi_barang, tahun_perolehan
          FROM cctv_inventory ORDER BY nama_kapal ASC"
     )->fetchAll();
 }
@@ -135,6 +146,7 @@ if ($hasSearched) {
                 <thead>
                     <tr>
                         <th>Serial Number</th>
+						<th>Kondisi</th>
                         <th>Nama Kapal</th>
                         <th>Jenis Barang</th>
                         <th>Brand</th>
@@ -148,6 +160,11 @@ if ($hasSearched) {
                     <?php foreach ($results as $row): ?>
                         <tr>
                             <td><?= htmlspecialchars($row['serial_number']) ?></td>
+							<td style="cursor: pointer; color: #2563eb; text-decoration: underline; font-weight: bold;" 
+								title="<?= htmlspecialchars(getDeskripsiKondisi($row['kondisi'] ?? 'Baru')) ?>" 
+								onclick="showKondisiLog(<?= (int)$row['id'] ?>, '<?= htmlspecialchars($row['serial_number']) ?>')">
+								<?= htmlspecialchars($row['kondisi'] ?? 'Baru') ?>
+							</td>
                             <td><?= htmlspecialchars($row['nama_kapal']) ?></td>
                             <td><?= htmlspecialchars($row['jenis_barang']) ?></td>
                             <td><?= htmlspecialchars($row['brand_barang']) ?></td>
@@ -188,5 +205,86 @@ if ($hasSearched) {
 
 <?php include __DIR__ . '/partials/footer.php'; ?>
 
+<!-- Modal Timeline Kondisi -->
+<!-- Modal Timeline Kondisi dengan Garis Penghubung -->
+<style>
+/* CSS Khusus untuk Timeline */
+.timeline-list {
+    list-style: none;
+    padding: 0 0 0 10px; /* Jarak dari kiri */
+    margin: 0;
+    position: relative;
+}
+.timeline-item {
+    position: relative;
+    padding-left: 20px;  /* Ruang untuk teks di sebelah kanan garis */
+    padding-bottom: 16px; /* Jarak antar item riwayat */
+    color: #334155;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+/* Membuat Titik Bulatan (Dot) */
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: 6px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #3b82f6; /* Warna biru untuk titik */
+    z-index: 2;
+}
+/* Membuat Garis Penghubung ke Bawah */
+.timeline-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 0px;       /* Posisinya sejajar dengan titik */
+    top: 14px;       /* Mulai dari bawah titik saat ini */
+    bottom: -6px;    /* Turun memanjang sampai titik item berikutnya */
+    width: 2px;
+    background-color: #cbd5e1; /* Warna garis abu-abu (Slate-300) */
+    z-index: 1;
+}
+/* Menghilangkan margin bawah pada item terakhir */
+.timeline-item:last-child {
+    padding-bottom: 0;
+}
+</style>
+
+<div id="logModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); align-items: center; justify-content: center;">
+    <div style="background-color: #fff; padding: 24px; border-radius: 12px; width: 90%; max-width: 450px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <h3 style="margin-top: 0; margin-bottom: 20px; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px;">
+            Riwayat Kondisi Barang<br><span id="log-sn" style="font-size: 0.85em; color: #64748b;"></span>
+        </h3>
+        
+        <!-- Wadah Timeline (class timeline-list dipanggil di sini) -->
+        <ul id="log-list" class="timeline-list">
+            <li class="timeline-item">Memuat riwayat...</li>
+        </ul>
+        
+        <div style="text-align: right; margin-top: 25px;">
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('logModal').style.display='none'">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function showKondisiLog(id, sn) {
+    document.getElementById('logModal').style.display = 'flex';
+    document.getElementById('log-sn').innerText = "SN: " + sn;
+    document.getElementById('log-list').innerHTML = '<li class="timeline-item">Memuat data riwayat...</li>';
+
+    // Mengambil data log dari get_kondisi_log.php
+    fetch('get_kondisi_log.php?id=' + id)
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('log-list').innerHTML = html;
+        })
+        .catch(err => {
+            document.getElementById('log-list').innerHTML = '<li class="timeline-item">Gagal memuat data.</li>';
+        });
+}
+</script>
 </body>
 </html>
