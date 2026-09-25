@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data['posisi_barang']   = trim($_POST['posisi_barang'] ?? '');
     $data['tahun_perolehan'] = trim($_POST['tahun_perolehan'] ?? '');
 
-    if (in_array('', [$data['serial_number'], $data['nama_kapal'], $data['jenis_barang'], $data['brand_barang'], $data['no_model'], $data['posisi_barang'], $data['tahun_perolehan']], true)) {
+if (in_array('', [$data['serial_number'], $data['nama_kapal'], $data['jenis_barang'], $data['brand_barang'], $data['no_model'], $data['posisi_barang'], $data['tahun_perolehan']], true)) {
         $error = 'Semua field wajib diisi.';
     } elseif (!preg_match('/^\d{4}$/', $data['tahun_perolehan'])) {
         $error = 'Tahun perolehan harus berupa 4 digit angka, contoh: 2024.';
@@ -65,13 +65,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'id' => $id,
                 ]);
 
-                // Cek apakah kondisi diubah, jika ya masukan ke log
+// Cek apakah kondisi diubah, jika ya masukan ke log
                 if ($data['kondisi'] !== $existing['kondisi']) {
                     $log = $pdo->prepare("INSERT INTO cctv_kondisi_log (cctv_id, kondisi) VALUES (:cctv_id, :kondisi)");
                     $log->execute(['cctv_id' => $id, 'kondisi' => $data['kondisi']]);
                 }
 
-                setFlash('success', 'Data berhasil diperbarui.');
+setFlash('success', 'Data berhasil diperbarui.');
             } else {
                 $stmt = $pdo->prepare(
                     "INSERT INTO cctv_inventory
@@ -89,13 +89,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'posisi_barang' => $data['posisi_barang'],
                     'tahun_perolehan' => $data['tahun_perolehan'],
                 ]);
-                
-                // Ambil ID yang baru ditambahkan untuk dimasukkan ke log pertama kalinya
+
+// Ambil ID yang baru ditambahkan untuk dimasukkan ke log pertama kalinya
                 $newId = $pdo->lastInsertId();
                 $log = $pdo->prepare("INSERT INTO cctv_kondisi_log (cctv_id, kondisi) VALUES (:cctv_id, :kondisi)");
                 $log->execute(['cctv_id' => $newId, 'kondisi' => $data['kondisi']]);
 
-                setFlash('success', 'Data baru berhasil ditambahkan.');
+setFlash('success', 'Data baru berhasil ditambahkan.');
             }
             header('Location: index.php');
             exit;
@@ -124,11 +124,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h1><?= $isEdit ? 'Edit Data CCTV' : 'Tambah Data CCTV' ?></h1>
     <p class="subtitle"><?= $isEdit ? 'Perbarui detail unit CCTV di bawah ini.' : 'Isi detail unit CCTV baru.' ?></p>
 
-    <?php if ($error): ?>
+<?php if ($error): ?>
         <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
 
-    <form method="post" class="stacked">
+<form method="post" class="stacked">
         <div class="field">
             <label for="serial_number">Serial Number</label>
             <div style="display: flex; gap: 8px; align-items: center;">
@@ -136,8 +136,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <button type="button" id="btn-scan" class="btn btn-secondary" style="white-space: nowrap;">📷 Scan</button>
             </div>
         </div>
-        
-        <div class="field">
+
+<div class="field">
             <label>Kondisi Barang</label>
             <select name="kondisi" required>
                 <option value="Baru" <?= $data['kondisi'] === 'Baru' ? 'selected' : '' ?>>1. Baru</option>
@@ -148,7 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </select>
         </div>
 
-        <div class="field">
+<div class="field">
             <label>Nama Kapal</label>
             <input type="text" name="nama_kapal" required value="<?= htmlspecialchars($data['nama_kapal']) ?>">
         </div>
@@ -157,8 +157,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="field"><label>No. Model Barang</label><input type="text" name="no_model" required value="<?= htmlspecialchars($data['no_model']) ?>"></div>
         <div class="field"><label>Posisi Barang</label><input type="text" name="posisi_barang" required value="<?= htmlspecialchars($data['posisi_barang']) ?>"></div>
         <div class="field"><label>Tahun Perolehan</label><input type="text" name="tahun_perolehan" required value="<?= htmlspecialchars($data['tahun_perolehan']) ?>" maxlength="4"></div>
-        
-        <div class="actions-row" style="margin-top: 20px;">
+
+<div class="actions-row" style="margin-top: 20px;">
             <button type="submit" class="btn"><?= $isEdit ? 'Simpan Perubahan' : 'Simpan Data' ?></button>
             <a href="index.php" class="btn btn-secondary">Batal</a>
         </div>
@@ -170,11 +170,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div style="background-color: #fff; padding: 24px; border-radius: 12px; width: 90%; max-width: 500px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
         <h3 style="margin-top: 0; margin-bottom: 16px; color: #0f172a;">Scan Serial Number</h3>
         <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 16px;">Arahkan kamera ke Barcode (Code-128) atau QR Code.</p>
-        
-        <!-- Wadah Kamera -->
+
+<!-- Wadah Kamera -->
         <div id="reader" style="width: 100%; margin-bottom: 20px;"></div>
-        
-        <button type="button" id="btn-close-scan" class="btn btn-danger">Tutup Kamera</button>
+
+<button type="button" id="btn-close-scan" class="btn btn-danger">Tutup Kamera</button>
     </div>
 </div>
 
@@ -189,32 +189,32 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnCloseScan = document.getElementById('btn-close-scan');
     const scannerModal = document.getElementById('scannerModal');
     const serialInput = document.getElementById('serial_number');
-    
-    let html5QrCode = null;
 
-    // Saat tombol scan diklik
+let html5QrCode = null;
+
+// Saat tombol scan diklik
     btnScan.addEventListener('click', function() {
         scannerModal.style.display = 'flex'; // Tampilkan modal
-        
-        if (!html5QrCode) {
+
+if (!html5QrCode) {
             html5QrCode = new Html5Qrcode("reader");
         }
 
-        const config = { fps: 10, qrbox: { width: 250, height: 150 } };
+const config = { fps: 10, qrbox: { width: 250, height: 150 } };
 
-        // Nyalakan kamera (mengutamakan kamera belakang)
+// Nyalakan kamera (mengutamakan kamera belakang)
         html5QrCode.start(
             { facingMode: "environment" }, 
             config,
             (decodedText, decodedResult) => {
                 // Ketika barcode berhasil terbaca
                 serialInput.value = decodedText;
-                
-                // Berikan efek highlight sementara
+
+// Berikan efek highlight sementara
                 serialInput.style.backgroundColor = '#dcfce7';
                 setTimeout(() => { serialInput.style.backgroundColor = ''; }, 1000);
-                
-                closeScanner(); // Matikan kamera dan tutup modal
+
+closeScanner(); // Matikan kamera dan tutup modal
             },
             (errorMessage) => {
                 // Abaikan error per-frame saat sedang mencari barcode
@@ -225,10 +225,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Saat tombol tutup diklik manual
+// Saat tombol tutup diklik manual
     btnCloseScan.addEventListener('click', closeScanner);
 
-    function closeScanner() {
+function closeScanner() {
         scannerModal.style.display = 'none'; // Sembunyikan modal
         if (html5QrCode) {
             // Matikan proses kamera

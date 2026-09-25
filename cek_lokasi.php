@@ -39,7 +39,7 @@ if ($hasSearched) {
             FROM cctv_inventory WHERE 1=1";
     $params = [];
 
-    // Jika mencari pakai keyword
+// Jika mencari pakai keyword
     if ($keyword !== '') {
         $sql .= " AND (serial_number LIKE :k1
             OR nama_kapal      LIKE :k2
@@ -48,21 +48,21 @@ if ($hasSearched) {
             OR no_model        LIKE :k5
             OR posisi_barang   LIKE :k6
             OR tahun_perolehan LIKE :k7)";
-        
-        $like = '%' . $keyword . '%';
+
+$like = '%' . $keyword . '%';
         $params['k1'] = $like; $params['k2'] = $like; $params['k3'] = $like;
         $params['k4'] = $like; $params['k5'] = $like; $params['k6'] = $like; $params['k7'] = $like;
     }
 
-    // Jika difilter pakai tahun
+// Jika difilter pakai tahun
     if ($tahun !== '') {
         $sql .= " AND tahun_perolehan = :tahun";
         $params['tahun'] = $tahun;
     }
 
-    $sql .= " ORDER BY nama_kapal ASC";
+$sql .= " ORDER BY nama_kapal ASC";
 
-    $stmt = $pdo->prepare($sql);
+$stmt = $pdo->prepare($sql);
     $stmt->execute($params);
     $results = $stmt->fetchAll();
 
@@ -89,17 +89,17 @@ if ($hasSearched) {
     <h1>Cek CCTV Berdasarkan Keyword</h1>
     <p class="subtitle">Masukkan serial number, nama kapal, jenis barang, brand, model, lokasi, atau tahun perolehan.</p>
 
-    <?php if ($flash): ?>
+<?php if ($flash): ?>
         <div class="alert alert-<?= htmlspecialchars($flash['type']) ?>"><?= htmlspecialchars($flash['message']) ?></div>
     <?php endif; ?>
 
-    <form method="get" action="" class="search-form">
+<form method="get" action="" class="search-form">
         <!-- Menyimpan state filter tahun saat mencari pakai keyword -->
         <?php if ($tahun !== ''): ?>
             <input type="hidden" name="tahun" value="<?= htmlspecialchars($tahun) ?>">
         <?php endif; ?>
 
-        <input
+<input
             type="text"
             name="lokasi"
             placeholder="Cari serial number, nama kapal, brand, model, lokasi..."
@@ -109,26 +109,26 @@ if ($hasSearched) {
         <button type="submit" class="btn">Cari</button>
     </form>
 
-    <?php if (function_exists('isAdmin') && isAdmin()): ?>
+<?php if (function_exists('isAdmin') && isAdmin()): ?>
     <div class="actions-row">
         <a href="add_edit.php" class="btn">+ Tambah Data</a>
         <a href="import.php" class="btn btn-secondary">Import dari Excel/CSV</a>
     </div>
     <?php endif; ?>
 
-    <?php if (count($results) > 0 || $hasSearched): ?>
-        
-        <!-- BARIS INFO DATA & FILTER TAHUN BERDAMPINGAN -->
+<?php if (count($results) > 0 || $hasSearched): ?>
+
+<!-- BARIS INFO DATA & FILTER TAHUN BERDAMPINGAN -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
             <span class="badge badge-blue" style="margin-bottom: 0;">Total <?= count($results) ?> data ditampilkan</span>
-            
-            <form method="get" action="" style="display: flex; align-items: center; gap: 8px;">
+
+<form method="get" action="" style="display: flex; align-items: center; gap: 8px;">
                 <!-- Menyimpan state keyword saat mengganti tahun -->
                 <?php if ($keyword !== ''): ?>
                     <input type="hidden" name="lokasi" value="<?= htmlspecialchars($keyword) ?>">
                 <?php endif; ?>
-                
-                <label for="filter_tahun" style="font-size: 0.875rem; font-weight: 600; color: #475569;">Tahun Perolehan:</label>
+
+<label for="filter_tahun" style="font-size: 0.875rem; font-weight: 600; color: #475569;">Tahun Perolehan:</label>
                 <select name="tahun" id="filter_tahun" onchange="this.form.submit()" style="height: 36px; padding: 0 10px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.875rem; background-color: #fff;">
                     <option value="">-- Semua Tahun --</option>
                     <?php foreach ($list_tahun as $t): ?>
@@ -140,7 +140,7 @@ if ($hasSearched) {
             </form>
         </div>
 
-        <?php if (count($results) > 0): ?>
+<?php if (count($results) > 0): ?>
             <div class="table-wrap">
             <table>
                 <thead>
@@ -192,7 +192,7 @@ if ($hasSearched) {
             </div>
         <?php endif; ?>
 
-    <?php else: ?>
+<?php else: ?>
         <div class="empty">
             <?php if (function_exists('isAdmin') && isAdmin()): ?>
                 Belum ada data.
@@ -257,13 +257,13 @@ if ($hasSearched) {
         <h3 style="margin-top: 0; margin-bottom: 20px; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px;">
             Riwayat Kondisi Barang<br><span id="log-sn" style="font-size: 0.85em; color: #64748b;"></span>
         </h3>
-        
-        <!-- Wadah Timeline (class timeline-list dipanggil di sini) -->
+
+<!-- Wadah Timeline (class timeline-list dipanggil di sini) -->
         <ul id="log-list" class="timeline-list">
             <li class="timeline-item">Memuat riwayat...</li>
         </ul>
-        
-        <div style="text-align: right; margin-top: 25px;">
+
+<div style="text-align: right; margin-top: 25px;">
             <button type="button" class="btn btn-secondary" onclick="document.getElementById('logModal').style.display='none'">Tutup</button>
         </div>
     </div>
@@ -275,7 +275,7 @@ function showKondisiLog(id, sn) {
     document.getElementById('log-sn').innerText = "SN: " + sn;
     document.getElementById('log-list').innerHTML = '<li class="timeline-item">Memuat data riwayat...</li>';
 
-    // Mengambil data log dari get_kondisi_log.php
+// Mengambil data log dari get_kondisi_log.php
     fetch('get_kondisi_log.php?id=' + id)
         .then(response => response.text())
         .then(html => {

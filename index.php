@@ -51,11 +51,11 @@ if ($hasSearched) {
     <h1>Cek Serial Number CCTV Kapal</h1>
     <p class="subtitle">Masukkan atau scan serial number untuk melihat detail unit CCTV.</p>
 
-    <?php if ($flash): ?>
+<?php if ($flash): ?>
         <div class="alert alert-<?= htmlspecialchars($flash['type']) ?>"><?= htmlspecialchars($flash['message']) ?></div>
     <?php endif; ?>
 
-    <!-- Form Pencarian -->
+<!-- Form Pencarian -->
     <form method="get" action="" class="search-form" id="search-form">
         <input
             type="text"
@@ -70,20 +70,20 @@ if ($hasSearched) {
         <button type="button" id="btn-scan" class="btn btn-secondary">📷 Scan Barcode</button>
     </form>
 
-    <!-- Area Tampilan Kamera Scanner (Disembunyikan secara bawaan) -->
+<!-- Area Tampilan Kamera Scanner (Disembunyikan secara bawaan) -->
     <div id="reader-wrapper" style="display:none; margin: 20px 0; text-align: center;">
         <div id="reader" style="width: 100%; max-width: 450px; margin: 0 auto;"></div>
         <button type="button" id="btn-close-scan" class="btn btn-danger btn-sm" style="margin-top: 10px;">Tutup Kamera</button>
     </div>
 
-    <?php if (function_exists('isAdmin') && isAdmin()): ?>
+<?php if (function_exists('isAdmin') && isAdmin()): ?>
     <div class="actions-row">
         <a href="add_edit.php" class="btn">+ Tambah Data</a>
         <a href="import.php" class="btn btn-secondary">Import dari Excel/CSV</a>
     </div>
     <?php endif; ?>
 
-    <?php if (count($results) > 0): ?>
+<?php if (count($results) > 0): ?>
         <div><span class="badge badge-blue">Total <?= count($results) ?> data ditampilkan</span></div>
         <div class="table-wrap">
         <table>
@@ -153,20 +153,20 @@ document.getElementById('btn-scan').addEventListener('click', function() {
     const wrapper = document.getElementById('reader-wrapper');
     wrapper.style.display = 'block';
 
-    if (!html5QrCode) {
+if (!html5QrCode) {
         html5QrCode = new Html5Qrcode("reader");
     }
 
-    const config = { fps: 10, qrbox: { width: 250, height: 150 } };
+const config = { fps: 10, qrbox: { width: 250, height: 150 } };
 
-    html5QrCode.start(
+html5QrCode.start(
         { facingMode: "environment" }, // Mengutamakan kamera belakang HP
         config,
         (decodedText, decodedResult) => {
             // Ketika barcode berhasil terdeteksi:
             document.getElementById('serial_number_input').value = decodedText;
-            
-            // Matikan kamera dan sembunyikan kotak scanner
+
+// Matikan kamera dan sembunyikan kotak scanner
             html5QrCode.stop().then(() => {
                 wrapper.style.display = 'none';
                 // Otomatis jalankan pencarian
@@ -241,13 +241,13 @@ document.getElementById('btn-close-scan').addEventListener('click', function() {
         <h3 style="margin-top: 0; margin-bottom: 20px; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px;">
             Riwayat Kondisi Barang<br><span id="log-sn" style="font-size: 0.85em; color: #64748b;"></span>
         </h3>
-        
-        <!-- Wadah Timeline (class timeline-list dipanggil di sini) -->
+
+<!-- Wadah Timeline (class timeline-list dipanggil di sini) -->
         <ul id="log-list" class="timeline-list">
             <li class="timeline-item">Memuat riwayat...</li>
         </ul>
-        
-        <div style="text-align: right; margin-top: 25px;">
+
+<div style="text-align: right; margin-top: 25px;">
             <button type="button" class="btn btn-secondary" onclick="document.getElementById('logModal').style.display='none'">Tutup</button>
         </div>
     </div>
@@ -259,7 +259,7 @@ function showKondisiLog(id, sn) {
     document.getElementById('log-sn').innerText = "SN: " + sn;
     document.getElementById('log-list').innerHTML = '<li class="timeline-item">Memuat data riwayat...</li>';
 
-    // Mengambil data log dari get_kondisi_log.php
+// Mengambil data log dari get_kondisi_log.php
     fetch('get_kondisi_log.php?id=' + id)
         .then(response => response.text())
         .then(html => {
