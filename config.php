@@ -4,6 +4,8 @@
  * Sesuaikan HOST, DB_NAME, DB_USER, dan DB_PASS dengan server Anda.
  */
 
+date_default_timezone_set('Asia/Jakarta');
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
