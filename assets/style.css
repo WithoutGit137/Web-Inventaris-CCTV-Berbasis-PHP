@@ -138,12 +138,50 @@ a:hover { color: var(--accent-dark); }
     line-height: 1;
 }
 
+.navbar-row {
+    display: flex;
+    align-items: center;
+}
+
 .navbar .menu {
     display: flex;
     align-items: center;
     gap: 4px;
     flex-wrap: wrap;
 }
+
+/* Tombol hamburger: hanya tampil di mobile (lihat media query di bawah) */
+button.nav-toggle {
+    display: none;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: background-color var(--t), border-color var(--t);
+}
+button.nav-toggle:hover,
+button.nav-toggle:focus-visible {
+    background: var(--bg-elevated);
+    border-color: var(--accent);
+    outline: none;
+}
+.nav-toggle-bar {
+    width: 18px;
+    height: 2px;
+    background: var(--text-2);
+    border-radius: 2px;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(2) { opacity: 0; }
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
 .navbar .menu a {
     color: var(--text-3);
@@ -822,32 +860,55 @@ td:has(.action-buttons) {
     .navbar {
         flex-direction: column;
         align-items: stretch;
-        padding: 14px 16px;
-        gap: 12px;
+        padding: 10px 16px;
+        gap: 0;
     }
-    .navbar .brand { justify-content: center; padding: 4px 0; }
+    .navbar-row { justify-content: space-between; }
+    .navbar .brand { padding: 4px 0; }
+    button.nav-toggle { display: inline-flex; }
+
+    /* Menu jadi panel dropdown yang menimpa konten, bukan mendorongnya ke bawah */
     .navbar .menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
         flex-direction: column;
-        width: 100%;
-        gap: 6px;
+        width: auto;
+        gap: 4px;
         align-items: stretch;
-    }
-    .navbar .menu a {
-        text-align: center;
-        padding: 10px;
-        background: var(--bg-surface-2);
-        border: 1px solid var(--border);
-        width: 100%;
-    }
-    .navbar .user-info {
-        border: none;
-        border-top: 1px solid var(--border);
+        margin-top: 1px;
+        padding: 10px 14px 16px;
+        background: var(--bg-surface);
         border-bottom: 1px solid var(--border);
-        justify-content: center;
-        width: 100%;
-        margin: 0;
-        padding: 10px 0;
+        box-shadow: 0 20px 44px rgba(0, 0, 0, 0.5);
     }
+    .navbar .menu.open { display: flex; }
+
+    /* Reset gaya link biasa saja; tombol .btn / .btn-logout tetap pakai gaya aslinya (lihat pengecualian :not) */
+    .navbar .menu a:not(.btn):not(.btn-logout) {
+        text-align: left;
+        padding: 12px;
+        background: transparent;
+        border: none;
+        border-radius: var(--r);
+        width: auto;
+    }
+    .navbar .menu a:not(.btn):not(.btn-logout):hover { background: var(--bg-elevated); }
+
+    .navbar .user-info {
+        order: -1;
+        border: none;
+        border-bottom: 1px solid var(--border);
+        justify-content: flex-start;
+        width: auto;
+        margin: 0 0 6px;
+        padding: 8px 12px 14px;
+    }
+    .navbar .menu .btn-logout,
+    .navbar .menu a.btn { width: 100%; margin-top: 6px; }
+
     .container, .login-container {
         width: 94%;
         margin: 16px auto;
