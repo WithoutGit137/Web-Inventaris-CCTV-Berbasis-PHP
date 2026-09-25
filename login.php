@@ -70,6 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html lang="id">
 <head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Admin - Inventory CCTV</title>
@@ -81,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <div class="container login-container">
     <div style="margin-bottom: 16px;">
-        <a href="index.php" style="color: #64748b; text-decoration: none; font-size: 0.875rem; font-weight: 500;">
+        <a href="index.php" style="color: var(--text-muted); text-decoration: none; font-size: 0.875rem; font-weight: 500;">
             ← Kembali ke Beranda
         </a>
     </div>

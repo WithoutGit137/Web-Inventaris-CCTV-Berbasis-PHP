@@ -112,6 +112,9 @@ setFlash('success', 'Data baru berhasil ditambahkan.');
 <!DOCTYPE html>
 <html lang="id">
 <head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?= $isEdit ? 'Edit Data' : 'Tambah Data' ?> CCTV</title>
@@ -166,10 +169,10 @@ setFlash('success', 'Data baru berhasil ditambahkan.');
 </div>
 
 <!-- Modal Scanner (Disembunyikan secara default) -->
-<div id="scannerModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); align-items: center; justify-content: center;">
-    <div style="background-color: #fff; padding: 24px; border-radius: 12px; width: 90%; max-width: 500px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        <h3 style="margin-top: 0; margin-bottom: 16px; color: #0f172a;">Scan Serial Number</h3>
-        <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 16px;">Arahkan kamera ke Barcode (Code-128) atau QR Code.</p>
+<div id="scannerModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 500px;">
+        <h3 style="border-bottom: none;">Scan Serial Number</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Arahkan kamera ke Barcode (Code-128) atau QR Code.</p>
 
 <!-- Wadah Kamera -->
         <div id="reader" style="width: 100%; margin-bottom: 20px;"></div>
@@ -210,9 +213,13 @@ const config = { fps: 10, qrbox: { width: 250, height: 150 } };
                 // Ketika barcode berhasil terbaca
                 serialInput.value = decodedText;
 
-// Berikan efek highlight sementara
-                serialInput.style.backgroundColor = '#dcfce7';
-                setTimeout(() => { serialInput.style.backgroundColor = ''; }, 1000);
+// Berikan efek highlight sementara (tetap kontras di tema gelap)
+                serialInput.style.backgroundColor = 'rgba(24, 199, 161, 0.25)';
+                serialInput.style.borderColor = 'var(--accent)';
+                setTimeout(() => {
+                    serialInput.style.backgroundColor = '';
+                    serialInput.style.borderColor = '';
+                }, 1000);
 
 closeScanner(); // Matikan kamera dan tutup modal
             },

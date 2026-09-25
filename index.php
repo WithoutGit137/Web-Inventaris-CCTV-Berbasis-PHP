@@ -37,6 +37,9 @@ if ($hasSearched) {
 <!DOCTYPE html>
 <html lang="id">
 <head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cek Serial Number CCTV Kapal</title>
@@ -104,7 +107,7 @@ if ($hasSearched) {
                 <?php foreach ($results as $row): ?>
                     <tr>
                         <td><?= htmlspecialchars($row['serial_number']) ?></td>
-						<td style="cursor: pointer; color: #2563eb; text-decoration: underline; font-weight: bold;" 
+						<td style="cursor: pointer; color: var(--accent); text-decoration: underline; font-weight: bold;" 
 							title="<?= htmlspecialchars(getDeskripsiKondisi($row['kondisi'] ?? 'Baru')) ?>" 
 							onclick="showKondisiLog(<?= (int)$row['id'] ?>, '<?= htmlspecialchars($row['serial_number']) ?>')">
 							<?= htmlspecialchars($row['kondisi'] ?? 'Baru') ?>
@@ -117,12 +120,15 @@ if ($hasSearched) {
                         <td><?= htmlspecialchars($row['tahun_perolehan']) ?></td>
                         <?php if (function_exists('isAdmin') && isAdmin()): ?>
                         <td>
-                            <a class="btn btn-sm" href="add_edit.php?id=<?= (int)$row['id'] ?>">Edit</a>
-                            <form method="post" action="delete.php" style="display:inline"
-                                  onsubmit="return confirm('Hapus data serial number <?= htmlspecialchars($row['serial_number']) ?>?');">
-                                <input type="hidden" name="id" value="<?= (int)$row['id'] ?>">
-                                <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
-                            </form>
+                            <div class="action-buttons">
+                                <a class="btn btn-sm btn-warning" href="add_edit.php?id=<?= (int)$row['id'] ?>">Edit</a>
+                                <form method="post" action="delete.php" class="inline-form"
+                                      data-sn="<?= htmlspecialchars($row['serial_number']) ?>"
+                                      onsubmit="return confirm('Hapus data serial number ' + this.dataset.sn + '?');">
+                                    <input type="hidden" name="id" value="<?= (int)$row['id'] ?>">
+                                    <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
+                                </form>
+                            </div>
                         </td>
                         <?php endif; ?>
                     </tr>
@@ -191,55 +197,10 @@ document.getElementById('btn-close-scan').addEventListener('click', function() {
 });
 </script>
 <!-- Modal Timeline Kondisi dengan Garis Penghubung -->
-<style>
-/* CSS Khusus untuk Timeline */
-.timeline-list {
-    list-style: none;
-    padding: 0 0 0 10px; /* Jarak dari kiri */
-    margin: 0;
-    position: relative;
-}
-.timeline-item {
-    position: relative;
-    padding-left: 20px;  /* Ruang untuk teks di sebelah kanan garis */
-    padding-bottom: 16px; /* Jarak antar item riwayat */
-    color: #334155;
-    font-size: 0.95rem;
-    line-height: 1.5;
-}
-/* Membuat Titik Bulatan (Dot) */
-.timeline-item::before {
-    content: '';
-    position: absolute;
-    left: -4px;
-    top: 6px;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: #3b82f6; /* Warna biru untuk titik */
-    z-index: 2;
-}
-/* Membuat Garis Penghubung ke Bawah */
-.timeline-item:not(:last-child)::after {
-    content: '';
-    position: absolute;
-    left: 0px;       /* Posisinya sejajar dengan titik */
-    top: 14px;       /* Mulai dari bawah titik saat ini */
-    bottom: -6px;    /* Turun memanjang sampai titik item berikutnya */
-    width: 2px;
-    background-color: #cbd5e1; /* Warna garis abu-abu (Slate-300) */
-    z-index: 1;
-}
-/* Menghilangkan margin bawah pada item terakhir */
-.timeline-item:last-child {
-    padding-bottom: 0;
-}
-</style>
-
-<div id="logModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); align-items: center; justify-content: center;">
-    <div style="background-color: #fff; padding: 24px; border-radius: 12px; width: 90%; max-width: 450px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        <h3 style="margin-top: 0; margin-bottom: 20px; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px;">
-            Riwayat Kondisi Barang<br><span id="log-sn" style="font-size: 0.85em; color: #64748b;"></span>
+<div id="logModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 450px;">
+        <h3>
+            Riwayat Kondisi Barang<br><span id="log-sn" style="font-size: 0.85em; color: var(--text-muted);"></span>
         </h3>
 
 <!-- Wadah Timeline (class timeline-list dipanggil di sini) -->

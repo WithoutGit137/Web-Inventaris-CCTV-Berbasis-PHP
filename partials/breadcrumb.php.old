@@ -1,0 +1,18 @@
+<?php
+/**
+ * partials/breadcrumb.php
+ * Menampilkan tag kecil + label halaman, diikuti garis pembatas tipis.
+ *
+ * Cara pakai (di halaman pemanggil, SEBELUM include ini):
+ *   $breadcrumbTag   = 'cctv';           // teks singkat di dalam tag
+ *   $breadcrumbLabel = 'cek serial number'; // label halaman saat ini
+ *   include __DIR__ . '/partials/breadcrumb.php';
+ */
+$breadcrumbTag   = $breadcrumbTag ?? 'cctv';
+$breadcrumbLabel = $breadcrumbLabel ?? '';
+?>
+<div class="breadcrumb">
+    <span class="tag"><?= htmlspecialchars($breadcrumbTag) ?></span>
+    <span class="breadcrumb-label"><?= htmlspecialchars($breadcrumbLabel) ?></span>
+</div>
+<hr class="divider-line">
